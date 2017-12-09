@@ -67,6 +67,9 @@ WerewolfDriver::WerewolfDriver()
 
 WerewolfDriver::~WerewolfDriver()
 {
+	for (Player *player : d->players) {
+		delete player;
+	}
 	delete d;
 }
 
@@ -118,7 +121,8 @@ void WerewolfDriver::run()
 	d->next_role_index = 0;
 
 	// Wait for at most 10 minutes
-	d->fetched.acquire(d->roles.size(), 600);
+	uint role_num = static_cast<uint>(d->roles.size());
+	d->fetched.acquire(role_num, 600);
 }
 
 void WerewolfDriver::end()
@@ -127,11 +131,28 @@ void WerewolfDriver::end()
 
 void WerewolfDriver::addPlayer(KA_IMPORT User *user)
 {
-	d->players.push_back(new Player(user));
+	if (user->data()) {
+		return;
+	}
+
+	Player *player = new Player(user);
+	user->setData(player);
+	d->players.push_back(player);
 }
 
-void WerewolfDriver::removePlayer(KA_IMPORT User *)
+void WerewolfDriver::removePlayer(KA_IMPORT User *user)
 {
+	Player *player = dynamic_cast<Player *>(user->data());
+	if (player == nullptr) {
+		return;
+	}
+
+	auto iter = std::find(d->players.begin(), d->players.end(), player);
+	if (iter != d->players.end()) {
+		d->players.erase(iter);
+		user->setData(nullptr);
+		delete player;
+	}
 }
 
 void WerewolfDriver::setRoles(std::vector<PlayerRole> &&roles)

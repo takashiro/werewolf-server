@@ -43,7 +43,7 @@ public:
 	void end() override;
 
 	void addPlayer(KA_IMPORT User *user) override;
-	void removePlayer(KA_IMPORT User *) override;
+	void removePlayer(KA_IMPORT User *user) override;
 
 	const std::map<int, KA_IMPORT UserAction> *actions() const override;
 

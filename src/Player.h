@@ -28,7 +28,7 @@ WG_NAMESPACE_BEGIN
 
 class WerewolfDriver;
 
-class Player
+class Player : public KA_IMPORT User::Data
 {
 public:
 	using Role = PlayerRole;
