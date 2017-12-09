@@ -173,10 +173,14 @@ const std::map<int, KA_IMPORT UserAction> *WerewolfDriver::actions() const
 
 PlayerRole WerewolfDriver::fetchRole(Player *player)
 {
-	PlayerRole role = d->next_role_index < d->roles.size() ? d->roles.at(d->next_role_index) : PlayerRole::Unknown;
-	d->next_role_index++;
-	d->fetched.release(1);
-	return role;
+	if (d->next_role_index < d->roles.size()) {
+		PlayerRole role = d->roles.at(d->next_role_index);
+		d->next_role_index++;
+		d->fetched.release(1);
+		return role;
+	} else {
+		return PlayerRole::Unknown;
+	}
 }
 
 WG_NAMESPACE_END

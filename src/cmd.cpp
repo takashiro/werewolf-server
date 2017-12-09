@@ -55,7 +55,6 @@ std::map<int, KA_IMPORT UserAction> CreateWerewolfActions()
 		}
 
 		PlayerRole role = driver->fetchRole(player);
-		
 		user->notify(cmd::UpdateRole, static_cast<int>(role));
 	};
 
