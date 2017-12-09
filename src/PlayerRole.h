@@ -28,6 +28,13 @@ enum class PlayerRole
 {
 	Unknown,
 
+	// Team Werewolf
+	Werewolf,
+	WolfKing,
+	WhiteWolfKing,
+	WolfBeauty,
+	SecretWolf,
+
 	// Team Villager
 	Villager,
 	Seer,
@@ -41,13 +48,6 @@ enum class PlayerRole
 	Knight,
 	Dementor,
 	Rogue,
-
-	// Team Werewolf
-	Werewolf,
-	WolfKing,
-	WhiteWolfKing,
-	WolfBeauty,
-	SecretWolf,
 
 	// Others
 	Jupiter,

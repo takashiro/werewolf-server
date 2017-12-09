@@ -20,7 +20,6 @@ takashiro@qq.com
 
 #include "cmd.h"
 
-#include "Player.h"
 #include "WerewolfDriver.h"
 
 #include <Room.h>
@@ -49,13 +48,8 @@ std::map<int, KA_IMPORT UserAction> CreateWerewolfActions()
 			return;
 		}
 
-		Player *player = dynamic_cast<Player *>(user->data());
-		if (player == nullptr) {
-			return;
-		}
-
-		PlayerRole role = driver->fetchRole(player);
-		user->notify(cmd::UpdateRole, static_cast<int>(role));
+		PlayerRole role = driver->fetchRole();
+		user->notify(cmd::FetchRole, static_cast<int>(role));
 	};
 
 	return actions;

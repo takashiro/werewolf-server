@@ -28,8 +28,6 @@ takashiro@qq.com
 
 WG_NAMESPACE_BEGIN
 
-class Player;
-
 class WerewolfDriver : public KA_IMPORT GameDriver
 {
 public:
@@ -40,17 +38,17 @@ public:
 	const KA_IMPORT Json &config() const override;
 
 	void run() override;
-	void end() override;
+	void end() override {}
 
-	void addPlayer(KA_IMPORT User *user) override;
-	void removePlayer(KA_IMPORT User *user) override;
+	void addPlayer(KA_IMPORT User *) override {}
+	void removePlayer(KA_IMPORT User *) override {}
 
 	const std::map<int, KA_IMPORT UserAction> *actions() const override;
 
 	void setRoles(std::vector<PlayerRole> &&roles);
 	const std::vector<PlayerRole> &roles() const;
 
-	PlayerRole fetchRole(Player *player);
+	PlayerRole fetchRole();
 
 private:
 	KA_DECLARE_PRIVATE

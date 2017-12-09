@@ -35,11 +35,9 @@ namespace cmd
 	{
 		Invalid = KA_IMPORT net::NetworkCommandCount,
 
-		ArrangeRole,
 		FetchRole,
-		UpdateRole,
 
-		Count
+		CommandCount
 	};
 }
 

@@ -21,7 +21,6 @@ takashiro@qq.com
 #include "WerewolfDriver.h"
 
 #include "cmd.h"
-#include "Player.h"
 #include "PlayerRole.h"
 
 #include <Room.h>
@@ -41,7 +40,6 @@ struct WerewolfDriver::Private
 {
 	Json config;
 	std::vector<PlayerRole> roles;
-	std::vector<Player *> players;
 
 	uint next_role_index;
 	Semaphore fetched;
@@ -67,9 +65,6 @@ WerewolfDriver::WerewolfDriver()
 
 WerewolfDriver::~WerewolfDriver()
 {
-	for (Player *player : d->players) {
-		delete player;
-	}
 	delete d;
 }
 
@@ -105,15 +100,6 @@ const Json &WerewolfDriver::config() const
 
 void WerewolfDriver::run()
 {
-	// Show cards to God
-	JsonArray roles;
-	roles.reserve(d->roles.size());
-	for (PlayerRole role : d->roles) {
-		roles.push_back(static_cast<int>(role));
-	}
-	User *god = room()->owner();
-	god->notify(cmd::ArrangeRole, roles);
-
 	// Shuffle cards
 	std::random_device rd;
 	std::mt19937 g(rd());
@@ -123,36 +109,6 @@ void WerewolfDriver::run()
 	// Wait for at most 10 minutes
 	uint role_num = static_cast<uint>(d->roles.size());
 	d->fetched.acquire(role_num, 600);
-}
-
-void WerewolfDriver::end()
-{
-}
-
-void WerewolfDriver::addPlayer(KA_IMPORT User *user)
-{
-	if (user->data()) {
-		return;
-	}
-
-	Player *player = new Player(user);
-	user->setData(player);
-	d->players.push_back(player);
-}
-
-void WerewolfDriver::removePlayer(KA_IMPORT User *user)
-{
-	Player *player = dynamic_cast<Player *>(user->data());
-	if (player == nullptr) {
-		return;
-	}
-
-	auto iter = std::find(d->players.begin(), d->players.end(), player);
-	if (iter != d->players.end()) {
-		d->players.erase(iter);
-		user->setData(nullptr);
-		delete player;
-	}
 }
 
 void WerewolfDriver::setRoles(std::vector<PlayerRole> &&roles)
@@ -171,7 +127,7 @@ const std::map<int, KA_IMPORT UserAction> *WerewolfDriver::actions() const
 	return &action_map;
 }
 
-PlayerRole WerewolfDriver::fetchRole(Player *player)
+PlayerRole WerewolfDriver::fetchRole()
 {
 	if (d->next_role_index < d->roles.size()) {
 		PlayerRole role = d->roles.at(d->next_role_index);

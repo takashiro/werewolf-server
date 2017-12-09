@@ -90,13 +90,11 @@
   <ItemGroup>
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Player.cpp" />
     <ClCompile Include="WerewolfDriver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmd.h" />
     <ClInclude Include="common.h" />
-    <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerRole.h" />
     <ClInclude Include="WerewolfDriver.h" />
   </ItemGroup>
