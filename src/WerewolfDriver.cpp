@@ -41,8 +41,14 @@ struct WerewolfDriver::Private
 	Json config;
 	std::vector<PlayerRole> roles;
 
-	uint next_role_index;
+	bool ready;
+	std::vector<PlayerRole> cards;
 	Semaphore fetched;
+
+	Private()
+		: ready(false)
+	{
+	}
 
 	void updateConfig()
 	{
@@ -103,12 +109,17 @@ void WerewolfDriver::run()
 	// Shuffle cards
 	std::random_device rd;
 	std::mt19937 g(rd());
-	std::shuffle(d->roles.begin(), d->roles.end(), g);
-	d->next_role_index = 0;
+	d->cards = d->roles;
+	std::shuffle(d->cards.begin(), d->cards.end(), g);
 
 	// Wait for at most 10 minutes
-	uint role_num = static_cast<uint>(d->roles.size());
-	d->fetched.acquire(role_num, 600);
+	d->ready = true;
+	while (d->fetched.acquire(1, 600)) {
+		if (d->cards.empty()) {
+			break;
+		}
+	}
+	d->ready = false;
 }
 
 void WerewolfDriver::setRoles(std::vector<PlayerRole> &&roles)
@@ -129,9 +140,18 @@ const std::map<int, KA_IMPORT UserAction> *WerewolfDriver::actions() const
 
 PlayerRole WerewolfDriver::fetchRole()
 {
-	if (d->next_role_index < d->roles.size()) {
-		PlayerRole role = d->roles.at(d->next_role_index);
-		d->next_role_index++;
+	if (!d->ready || d->cards.empty()) {
+		return PlayerRole::Unknown;
+	}
+
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::uniform_int_distribution<uint> dist(0, static_cast<uint>(d->cards.size()) - 1);
+	uint chosen_id = dist(g);
+
+	if (chosen_id < d->cards.size()) {
+		PlayerRole role = d->cards.at(chosen_id);
+		d->cards.erase(d->cards.begin() + chosen_id);
 		d->fetched.release(1);
 		return role;
 	} else {
