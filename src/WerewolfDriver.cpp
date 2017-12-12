@@ -40,6 +40,7 @@ struct WerewolfDriver::Private
 {
 	Json config;
 	std::vector<PlayerRole> roles;
+	uint salt;
 
 	bool ready;
 	std::vector<PlayerRole> cards;
@@ -48,11 +49,16 @@ struct WerewolfDriver::Private
 	Private()
 		: ready(false)
 	{
+		std::random_device rd;
+		std::mt19937 g(rd());
+		std::uniform_int_distribution<uint> dist(0, 0xFFFFFFFFu);
+		salt = dist(g);
 	}
 
 	void updateConfig()
 	{
 		JsonObject config;
+		config["salt"] = salt;
 
 		JsonArray roles;
 		for (PlayerRole role : this->roles) {
